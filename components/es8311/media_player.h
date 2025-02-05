@@ -20,10 +20,8 @@ class ES8311MediaPlayer : public media_player::MediaPlayer {
 
  private:
   ES8311Component *es8311_ = nullptr;
-  std::vector<int16_t> audio_buffer_;
-
-  void process_audio_stream();
 };
 
 }  // namespace es8311
 }  // namespace esphome
+
