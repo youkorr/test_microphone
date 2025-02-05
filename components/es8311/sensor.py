@@ -33,3 +33,4 @@ async def to_code(config):
         cg.add(es8311_component.set_bits_per_sample(config['bits_per_sample']))
     if 'mic_gain' in config:
         cg.add(es8311_component.set_mic_gain(config['mic_gain']))
+
