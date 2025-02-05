@@ -7,7 +7,7 @@ CODEOWNERS = ["@youkorr"]
 DEPENDENCIES = ["i2c"]
 
 es8311_ns = cg.esphome_ns.namespace("es8311")
-ES8311AudioDAC = es8311_ns.class_("ES8311AudioDAC", i2s_audio.I2SAudioDAC, i2c.I2CDevice)
+ES8311AudioDAC = es8311_ns.class_("ES8311AudioDAC", i2c.I2CDevice)  # Suppression de i2s_audio.I2SAudioDAC
 
 CONFIG_SCHEMA = (
     cv.Schema(
@@ -23,4 +23,5 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await i2c.register_i2c_device(var, config)
     cg.add(var.set_address(config[CONF_ADDRESS]))
+
 
