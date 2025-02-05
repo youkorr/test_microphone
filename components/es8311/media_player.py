@@ -1,12 +1,50 @@
+# __init__.py
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import media_player, i2c
+from esphome.components import i2c
 from esphome.const import CONF_ID
 
-from . import ES8311Component
+DEPENDENCIES = ['i2c']
+AUTO_LOAD = ['media_player']
+
+es8311_ns = cg.esphome_ns.namespace('es8311')
+ES8311Component = es8311_ns.class_('ES8311Component', cg.Component, i2c.I2CDevice)
+
+CONF_SAMPLE_RATE = "sample_rate"
+CONF_BITS_PER_SAMPLE = "bits_per_sample"
+CONF_ENABLE_PIN = "enable_pin"
+CONF_MIC_GAIN = "mic_gain"
+
+CONFIG_SCHEMA = cv.Schema({
+    cv.GenerateID(): cv.declare_id(ES8311Component),
+    cv.Required(CONF_SAMPLE_RATE): cv.int_range(min=8000, max=96000),
+    cv.Required(CONF_BITS_PER_SAMPLE): cv.one_of(16, 24, 32, int=True),
+    cv.Required(CONF_ENABLE_PIN): cv.int_range(min=0),
+    cv.Optional(CONF_MIC_GAIN, default=42): cv.int_range(min=0, max=100),
+}).extend(cv.COMPONENT_SCHEMA).extend(i2c.i2c_device_schema(0x18))
+
+async def to_code(config):
+    var = cg.new_Pvariable(config[CONF_ID])
+    await cg.register_component(var, config)
+    await i2c.register_i2c_device(var, config)
+
+    cg.add(var.set_sample_rate(config[CONF_SAMPLE_RATE]))
+    cg.add(var.set_bits_per_sample(config[CONF_BITS_PER_SAMPLE]))
+    cg.add(var.set_enable_pin(config[CONF_ENABLE_PIN]))
+    cg.add(var.set_mic_gain(config[CONF_MIC_GAIN]))
+
+# media_player.py
+import esphome.codegen as cg
+import esphome.config_validation as cv
+from esphome.components import media_player
+from esphome.const import CONF_ID
+
+from . import es8311_ns, ES8311Component
 
 DEPENDENCIES = ['es8311']
 AUTO_LOAD = ['es8311']
+
+ES8311MediaPlayer = es8311_ns.class_('ES8311MediaPlayer', media_player.MediaPlayer, cg.Component)
 
 CONF_ES8311_ID = 'es8311_id'
 
@@ -19,94 +57,55 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await media_player.register_media_player(var, config)
     
-    es8311 = await cg.get_variable(config[CONF_ES8311_ID])
-    cg.add(var.set_es8311(es8311))
+    parent = await cg.get_variable(config[CONF_ES8311_ID])
+    cg.add(var.set_parent(parent))
 
-# In es8311.h
-MEDIA_PLAYER_CLASS = """
-class ES8311MediaPlayer : public media_player::MediaPlayer, public Component {
+# ES8311.h
+"""
+#pragma once
+
+#include "esphome/core/component.h"
+#include "esphome/components/i2c/i2c.h"
+#include "esphome/components/media_player/media_player.h"
+
+namespace esphome {
+namespace es8311 {
+
+class ES8311Component : public Component, public i2c::I2CDevice {
  public:
-  void set_es8311(ES8311Component *es8311) { es8311_ = es8311; }
   void setup() override;
-  media_player::MediaPlayerTraits get_traits() override;
+  void dump_config() override;
+  float get_setup_priority() const override { return setup_priority::HARDWARE; }
   
-  void control(const media_player::MediaPlayerCall &call) override;
-  void volume_up() override;
-  void volume_down() override;
-  void mute() override;
-  void unmute() override;
-  void play() override;
-  void pause() override;
-  void stop() override;
+  void set_sample_rate(uint32_t sample_rate) { sample_rate_ = sample_rate; }
+  void set_bits_per_sample(uint8_t bits) { bits_per_sample_ = bits; }
+  void set_enable_pin(uint8_t pin) { enable_pin_ = pin; }
+  void set_mic_gain(uint8_t gain) { mic_gain_ = gain; }
+  
+  void set_volume(float volume);
+  float get_volume() const { return volume_; }
+  void set_mute(bool mute);
   
  protected:
-  ES8311Component *es8311_;
+  uint32_t sample_rate_{16000};
+  uint8_t bits_per_sample_{16};
+  uint8_t enable_pin_{0};
+  uint8_t mic_gain_{42};
+  float volume_{0.5};
+  bool is_muted_{false};
 };
-"""
 
-# In es8311.cpp
-MEDIA_PLAYER_IMPL = """
-void ES8311MediaPlayer::setup() {
-  // Initialize the media player
-  this->state = media_player::MEDIA_PLAYER_STATE_IDLE;
-}
+class ES8311MediaPlayer : public media_player::MediaPlayer, public Component {
+ public:
+  void set_parent(ES8311Component *parent) { parent_ = parent; }
+  void setup() override;
+  media_player::MediaPlayerTraits get_traits() override;
+  void control(const media_player::MediaPlayerCall &call) override;
+  
+ protected:
+  ES8311Component *parent_;
+};
 
-media_player::MediaPlayerTraits ES8311MediaPlayer::get_traits() {
-  auto traits = media_player::MediaPlayerTraits();
-  traits.set_supports_pause(true);
-  traits.set_supports_stop(true);
-  traits.set_supports_volume(true);
-  traits.set_supports_volume_set(true);
-  traits.set_supports_mute(true);
-  return traits;
-}
-
-void ES8311MediaPlayer::control(const media_player::MediaPlayerCall &call) {
-  if (call.get_volume().has_value()) {
-    float volume = *call.get_volume();
-    // Set volume using ES8311 codec
-    this->es8311_->set_volume(volume * 100);
-  }
-  if (call.get_mute().has_value()) {
-    bool mute = *call.get_mute();
-    if (mute) {
-      this->mute();
-    } else {
-      this->unmute();
-    }
-  }
-}
-
-void ES8311MediaPlayer::volume_up() {
-  // Implement volume up logic
-  this->es8311_->set_volume(this->es8311_->get_volume() + 5);
-}
-
-void ES8311MediaPlayer::volume_down() {
-  // Implement volume down logic
-  this->es8311_->set_volume(this->es8311_->get_volume() - 5);
-}
-
-void ES8311MediaPlayer::mute() {
-  this->es8311_->set_mute(true);
-}
-
-void ES8311MediaPlayer::unmute() {
-  this->es8311_->set_mute(false);
-}
-
-void ES8311MediaPlayer::play() {
-  this->state = media_player::MEDIA_PLAYER_STATE_PLAYING;
-  this->unmute();
-}
-
-void ES8311MediaPlayer::pause() {
-  this->state = media_player::MEDIA_PLAYER_STATE_PAUSED;
-  this->mute();
-}
-
-void ES8311MediaPlayer::stop() {
-  this->state = media_player::MEDIA_PLAYER_STATE_IDLE;
-  this->mute();
-}
+}  // namespace es8311
+}  // namespace esphome
 """
