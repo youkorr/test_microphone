@@ -12,7 +12,6 @@ void ES8311AudioDAC::start() {
     return;
   }
   
-  // Implement DAC start logic
   ESP_LOGD(TAG, "Starting ES8311 Audio DAC");
 }
 
@@ -22,7 +21,6 @@ void ES8311AudioDAC::stop() {
     return;
   }
   
-  // Implement DAC stop logic
   ESP_LOGD(TAG, "Stopping ES8311 Audio DAC");
 }
 
@@ -32,7 +30,6 @@ void ES8311AudioDAC::write_sample(int16_t sample) {
     return;
   }
   
-  // Implement single sample write logic
   es8311_->write_audio_data(&sample, 1);
 }
 
@@ -42,7 +39,6 @@ void ES8311AudioDAC::write_samples(const int16_t *samples, size_t count) {
     return;
   }
   
-  // Implement multiple samples write logic
   es8311_->write_audio_data(samples, count);
 }
 
