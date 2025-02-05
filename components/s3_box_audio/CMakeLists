@@ -1,0 +1,5 @@
+esphome_component(s3_box_audio
+    i2s_audio.h
+    i2s_audio.cpp
+    sensor.py
+)
