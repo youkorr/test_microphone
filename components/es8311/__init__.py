@@ -1,39 +1,26 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import i2c, media_player, audio_dac
+from esphome.components import i2s_audio, i2c
+from esphome.const import CONF_ID, CONF_ADDRESS
 
 CODEOWNERS = ["@youkorr"]
-DEPENDENCIES = ['i2c']
-MULTI_CONF = True
+DEPENDENCIES = ["i2c"]
 
-es8311_ns = cg.esphome_ns.namespace('es8311')
-ES8311Component = es8311_ns.class_('ES8311Component', cg.Component, i2c.I2CDevice)
-ES8311MediaPlayer = es8311_ns.class_('ES8311MediaPlayer', media_player.MediaPlayer)
-ES8311AudioDAC = es8311_ns.class_('ES8311AudioDAC', audio_dac.AudioDAC)
+es8311_ns = cg.esphome_ns.namespace("es8311")
+ES8311AudioDAC = es8311_ns.class_("ES8311AudioDAC", i2s_audio.I2SAudioDAC, i2c.I2CDevice)
 
-CONFIG_SCHEMA = cv.Schema({
-    cv.GenerateID(): cv.declare_id(ES8311Component),
-    cv.Optional('sample_rate', default=44100): cv.int_,
-    cv.Optional('bits_per_sample', default=16): cv.int_,
-    cv.Optional('enable_pin', default=46): cv.int_,
-}).extend(i2c.i2c_device_schema(0x18))
+CONFIG_SCHEMA = (
+    cv.Schema(
+        {
+            cv.GenerateID(): cv.declare_id(ES8311AudioDAC),
+            cv.Required(CONF_ADDRESS): cv.i2c_address,
+        }
+    )
+    .extend(i2c.i2c_device_schema())
+)
 
 async def to_code(config):
-    var = cg.new_Pvariable(config['id'])
-    await cg.register_component(var, config)
+    var = cg.new_Pvariable(config[CONF_ID])
     await i2c.register_i2c_device(var, config)
-
-    var.set_sample_rate(config['sample_rate'])
-    var.set_bits_per_sample(config['bits_per_sample'])
-    var.set_enable_pin(config['enable_pin'])
-
-    # Media Player configuration
-    player = cg.new_Pvariable(config['id'])
-    await media_player.register_media_player(player, config)
-    cg.add(player.set_es8311(var))
-
-    # Audio DAC configuration
-    dac = cg.new_Pvariable(config['id'])
-    await audio_dac.register_audio_dac(dac, config)
-    cg.add(dac.set_es8311(var))
+    cg.add(var.set_address(config[CONF_ADDRESS]))
 
