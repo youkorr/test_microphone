@@ -1,7 +1,9 @@
 esphome_component(es8311
     es8311.h
     es8311.cpp
+    audio_dac.h
+    audio_dac.cpp
     media_player.h
     media_player.cpp
-    sensor.py
 )
+
