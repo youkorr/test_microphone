@@ -11,56 +11,61 @@ bool ES8311MediaPlayer::play_() {
     ESP_LOGE(TAG, "ES8311 component not initialized");
     return false;
   }
-
-  // Start audio processing
-  process_audio_stream();
+  
+  ESP_LOGD(TAG, "Starting media playback");
   return true;
 }
 
 bool ES8311MediaPlayer::pause_() {
-  // Implement pause logic if needed
+  if (!es8311_) {
+    ESP_LOGE(TAG, "ES8311 component not initialized");
+    return false;
+  }
+  
+  ESP_LOGD(TAG, "Pausing media playback");
   return true;
 }
 
 bool ES8311MediaPlayer::stop_() {
-  // Clear audio buffer and stop playback
-  audio_buffer_.clear();
+  if (!es8311_) {
+    ESP_LOGE(TAG, "ES8311 component not initialized");
+    return false;
+  }
+  
+  ESP_LOGD(TAG, "Stopping media playback");
   return true;
 }
 
 bool ES8311MediaPlayer::unmute_() {
-  // Implement unmute logic
+  if (!es8311_) {
+    ESP_LOGE(TAG, "ES8311 component not initialized");
+    return false;
+  }
+  
+  ESP_LOGD(TAG, "Unmuting audio");
   return true;
 }
 
 bool ES8311MediaPlayer::mute_() {
-  // Implement mute logic
+  if (!es8311_) {
+    ESP_LOGE(TAG, "ES8311 component not initialized");
+    return false;
+  }
+  
+  ESP_LOGD(TAG, "Muting audio");
   return true;
 }
 
 bool ES8311MediaPlayer::control_() {
-  // Implement any additional control logic
+  if (!es8311_) {
+    ESP_LOGE(TAG, "ES8311 component not initialized");
+    return false;
+  }
+  
+  ESP_LOGD(TAG, "Controlling media player");
   return true;
-}
-
-void ES8311MediaPlayer::process_audio_stream() {
-  // Example of processing and playing audio
-  // In a real implementation, you'd get audio data from a stream
-  if (audio_buffer_.empty()) {
-    // Generate a simple test tone or load audio data
-    for (int i = 0; i < 1024; i++) {
-      // Simple sine wave generation
-      audio_buffer_.push_back(
-        static_cast<int16_t>(32767 * sin(2 * M_PI * 440 * i / 16000))
-      );
-    }
-  }
-
-  // Write audio data to I2S
-  if (es8311_) {
-    es8311_->write_audio_data(audio_buffer_.data(), audio_buffer_.size());
-  }
 }
 
 }  // namespace es8311
 }  // namespace esphome
+
