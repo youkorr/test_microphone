@@ -16,7 +16,7 @@ CONFIG_SCHEMA = (
             cv.Required(CONF_ADDRESS): cv.i2c_address,
         }
     )
-    .extend(i2c.i2c_device_schema())
+    .extend(i2c.i2c_device_schema(0x18))
 )
 
 async def to_code(config):
