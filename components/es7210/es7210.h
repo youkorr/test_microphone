@@ -39,3 +39,4 @@ class ES7210Component : public Component, public i2c::I2CDevice {
 
 }  // namespace es7210
 }  // namespace esphome
+
