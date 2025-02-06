@@ -1,21 +1,15 @@
-#include "esphome/components/es7210/microphone.h"  // Assurez-vous que cette inclusion est présente
+#include "esphome/components/es7210/microphone.h"
 #include "esphome/core/log.h"
 #include "driver/i2s.h"
-#include "esphome/core/gpio.h"  // Assure l'inclusion des définitions GPIO
 
 namespace esphome {
 namespace es7210 {
 
 static const char *const TAG = "es7210";
 
-// Définir les GPIOs manquants si non définis
-#define GPIO_NUM_17 17
-#define GPIO_NUM_45 45
-#define GPIO_NUM_16 16
-
 void ES7210Component::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up ES7210 Codec for ESP32 S3 Box 3");
-  
+  ESP_LOGCONFIG(TAG, "Setting up ES7210 Codec for ESP32-S3 Box 3");
+
   // Vérifier la présence du périphérique
   if (!this->read_register(ES7210_RESET_REG)) {
     ESP_LOGE(TAG, "ES7210 not found at address 0x%02X", this->address_);
@@ -107,9 +101,11 @@ int ES7210Microphone::read_chunk_(int16_t *buffer, size_t length) {
     ESP_LOGE(TAG, "Failed to read chunk: %s", esp_err_to_name(err));
     return -1;
   }
-  return length;  // Retourne le nombre d'échantillons lus
+  return static_cast<int>(length);  // Retourne le nombre d'échantillons lus
 }
 
 }  // namespace es7210
 }  // namespace esphome
+
+
 
