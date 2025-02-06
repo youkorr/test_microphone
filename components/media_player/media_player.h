@@ -2,7 +2,9 @@
 
 #include "esphome/core/entity_base.h"
 #include "esphome/core/helpers.h"
-#include "esphome/components/i2s_audio/i2s_audio.h"  // Ajout de la référence à i2s_audio
+#include "esphome/components/i2s_audio/i2s_audio.h"
+#include "esphome/components/es7210/es7210.h"  // Ajout du codec ES7210
+#include "esphome/components/es8311/es8311.h"  // Ajout du codec ES8311
 
 namespace esphome {
 namespace media_player {
@@ -21,7 +23,7 @@ const char *media_player_state_to_string(MediaPlayerState state);
 enum MediaPlayerCommand : uint8_t {
   MEDIA_PLAYER_COMMAND_PLAY = 0,
   MEDIA_PLAYER_COMMAND_PAUSE = 1,
-  MEDIA_PLAYER_COMMAND_STOP = 2,  // La commande STOP est bien présente
+  MEDIA_PLAYER_COMMAND_STOP = 2,
   MEDIA_PLAYER_COMMAND_MUTE = 3,
   MEDIA_PLAYER_COMMAND_UNMUTE = 4,
   MEDIA_PLAYER_COMMAND_TOGGLE = 5,
@@ -51,11 +53,19 @@ class MediaPlayer : public EntityBase {
   // Méthode virtuelle pour obtenir les traits du lecteur
   virtual MediaPlayerTraits get_traits() = 0;
 
+  // Méthodes pour configurer les codecs
+  void set_es7210(es7210::ES7210Component *es7210) { es7210_ = es7210; }
+  void set_es8311(es8311::ES8311Component *es8311) { es8311_ = es8311; }
+
  protected:
   friend MediaPlayerCall;
 
   // Méthode virtuelle pour contrôler le lecteur
   virtual void control(const MediaPlayerCall &call) = 0;
+
+  // Références aux codecs
+  es7210::ES7210Component *es7210_{nullptr};
+  es8311::ES8311Component *es8311_{nullptr};
 
   // CallbackManager pour gérer les callbacks d'état
   CallbackManager<void()> state_callback_{};
