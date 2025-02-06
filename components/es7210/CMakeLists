@@ -3,5 +3,6 @@ esphome_component(es7210
     es7210.cpp
     microphone.h
     microphone.cpp
+    gpio_definitions.h
     sensor.py
 )
