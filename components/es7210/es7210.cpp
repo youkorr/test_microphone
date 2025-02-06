@@ -1,19 +1,17 @@
 #include "es7210.h"
 #include "esphome/core/log.h"
 #include "driver/i2s.h"
-#include "esphome/core/gpio.h"  // Assurer l'inclusion des définitions GPIO
+#include "esphome/core/gpio.h"  // Assure l'inclusion des définitions GPIO
 
 namespace esphome {
 namespace es7210 {
 
 static const char *const TAG = "es7210";
 
-// Assure-toi que ces registres sont définis quelque part
-#define ES7210_RESET_REG 0x00
-#define ES7210_MAINCLK_REG 0x01
-#define ES7210_POWER_REG 0x02
-#define ES7210_PDN_REG 0x03
-#define ES7210_ANALOG_REG 0x04
+// Définir les GPIOs manquants si non définis
+#define GPIO_NUM_17 17
+#define GPIO_NUM_45 45
+#define GPIO_NUM_16 16
 
 void ES7210Component::setup() {
   ESP_LOGCONFIG(TAG, "Setting up ES7210 Codec for ESP32 S3 Box 3");
@@ -101,6 +99,14 @@ uint8_t ES7210Component::read_register(uint8_t reg) {
   return this->read_byte(reg, &value) ? value : 0xFF;
 }
 
+// Implémentation de la méthode read_chunk_
+int ES7210Microphone::read_chunk_(int16_t *buffer, size_t length) {
+  // Remplir ce buffer avec des données du codec
+  // Ici tu dois ajouter ta logique pour lire les données I2S du codec ES7210
+  return 0;  // Valeur de retour à ajuster selon ton besoin
+}
+
 }  // namespace es7210
 }  // namespace esphome
+
 
