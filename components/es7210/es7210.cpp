@@ -1,7 +1,6 @@
-#include "esphome/core/component.h"
+#include "esphome/core/log.h"  // Ajout pour ESP_LOGCONFIG et ESP_LOGE
 #include "esphome/components/i2c/i2c.h"
 #include "driver/i2s.h"
-#include "es7210.h"  // Assure-toi que ce fichier est bien inclus ici
 
 namespace esphome {
 namespace es7210 {
@@ -11,44 +10,36 @@ static const char *const TAG = "es7210";
 void ES7210Component::setup() {
     ESP_LOGCONFIG(TAG, "Setting up ES7210 Codec for ESP32 S3 Box 3");
 
-    // Verify device presence
+    // Vérifier la présence du périphérique
     if (!this->read_register(ES7210_RESET_REG)) {
         ESP_LOGE(TAG, "ES7210 not found at address 0x%02X", this->address_);
         mark_failed();
         return;
     }
 
-    // Initialize codec and configure I2S
-    this->initialize_codec();
-    this->configure_analog_path();
-    this->configure_i2s();
+    // Initialiser le codec et configurer I2S
+    initialize_codec();
+    configure_analog_path();
+    configure_i2s();
 
-    // Set sample rate and bits per sample from configuration
-    if (this->has_id()) {
-        uint32_t sample_rate = this->sample_rate_;
-        uint8_t bits_per_sample = this->bits_per_sample_;
+    // Enregistrer le taux d'échantillonnage et les bits par échantillon depuis la configuration
+    uint32_t sample_rate = this->sample_rate_;
+    uint8_t bits_per_sample = this->bits_per_sample_;
 
-        // Optionally, you can log or initialize with default values
-        ESP_LOGCONFIG(TAG, "Sample Rate: %u Hz", sample_rate);
-        ESP_LOGCONFIG(TAG, "Bits per Sample: %u", bits_per_sample);
-    }
+    ESP_LOGCONFIG(TAG, "Sample Rate: %u Hz", sample_rate);
+    ESP_LOGCONFIG(TAG, "Bits per Sample: %u", bits_per_sample);
 }
 
 void ES7210Component::initialize_codec() {
-    // Soft reset sequence
+    // Réinitialisation douce
     write_register(ES7210_RESET_REG, 0x80);
-    delay(10);
+    vTaskDelay(10 / portTICK_PERIOD_MS);  // Remplacer delay() par vTaskDelay
     write_register(ES7210_RESET_REG, 0x00);
 
-    // Power management and clock configuration
-    write_register(ES7210_MAINCLK_REG, 0x00);  // Master clock configuration
-    write_register(ES7210_POWER_REG, 0x00);    // Power up all channels
-    write_register(ES7210_PDN_REG, 0x00);      // Disable power down
-}
-
-void ES7210Component::configure_analog_path() {
-    // Specific analog path configuration for S3 Box 3
-    write_register(ES7210_ANALOG_REG, 0x33);  // Example: Configure analog input path
+    // Gestion de l'alimentation et configuration de l'horloge
+    write_register(ES7210_MAINCLK_REG, 0x00);
+    write_register(ES7210_POWER_REG, 0x00);
+    write_register(ES7210_PDN_REG, 0x00);
 }
 
 bool ES7210Component::configure_i2s() {
@@ -67,10 +58,10 @@ bool ES7210Component::configure_i2s() {
     };
 
     i2s_pin_config_t pin_config = {
-        .bck_io_num = GPIO17,     // BCLK pin
-        .ws_io_num = GPIO45,      // LRCLK pin
+        .bck_io_num = GPIO_NUM_17,     // BCLK pin
+        .ws_io_num = GPIO_NUM_45,      // LRCLK pin
         .data_out_num = I2S_PIN_NO_CHANGE,
-        .data_in_num = GPIO16     // DOUT pin for microphone
+        .data_in_num = GPIO_NUM_16     // DOUT pin pour microphone
     };
 
     esp_err_t result = i2s_driver_install(i2s_port_, &i2s_config, 0, NULL);
@@ -106,6 +97,7 @@ uint8_t ES7210Component::read_register(uint8_t reg) {
 
 }  // namespace es7210
 }  // namespace esphome
+
 
 
 
