@@ -1,9 +1,8 @@
-// media_player_es8311.cpp
 #include "media_player_es8311.h"
 #include "esphome/core/log.h"
 
 namespace esphome {
-namespace es8311 {
+namespace media_player_es8311 {
 
 static const char *const TAG = "media_player_es8311";
 
@@ -49,5 +48,6 @@ void MediaPlayerES8311::set_media_source(const std::string &source) {
   this->current_source_ = source;
 }
 
-}  // namespace es8311
+}  // namespace media_player_es8311
 }  // namespace esphome
+
