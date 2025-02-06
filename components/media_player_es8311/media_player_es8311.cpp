@@ -51,3 +51,4 @@ void MediaPlayerES8311::set_media_source(const std::string &source) {
 }  // namespace media_player_es8311
 }  // namespace esphome
 
+
