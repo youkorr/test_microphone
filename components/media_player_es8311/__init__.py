@@ -3,7 +3,7 @@ import esphome.config_validation as cv
 from esphome.const import CONF_ID
 from esphome.components import media_player
 from esphome.components.i2s_audio import I2SAudioOut
-from ..es8311 import ES8311
+from esphome.components.es8311 import ES8311
 
 DEPENDENCIES = ["media_player", "i2s_audio", "es8311"]
 
