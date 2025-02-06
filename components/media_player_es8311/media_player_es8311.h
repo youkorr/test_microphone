@@ -2,7 +2,7 @@
 #include "esphome/components/media_player/media_player.h"
 #include "esphome/core/component.h"
 #include "esphome/components/i2s_audio/i2s_audio.h"
-#include "esphome/components/es8311/es8311.h"
+#include "../es8311/es8311.h"
 
 namespace esphome {
 namespace media_player_es8311 {
