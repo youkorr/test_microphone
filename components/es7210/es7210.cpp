@@ -1,43 +1,51 @@
 #include "es7210.h"
 #include "esphome/core/log.h"
 #include "driver/i2s.h"
+#include "esphome/core/gpio.h"  // Assurer l'inclusion des définitions GPIO
 
 namespace esphome {
 namespace es7210 {
 
 static const char *const TAG = "es7210";
 
+// Assure-toi que ces registres sont définis quelque part
+#define ES7210_RESET_REG 0x00
+#define ES7210_MAINCLK_REG 0x01
+#define ES7210_POWER_REG 0x02
+#define ES7210_PDN_REG 0x03
+#define ES7210_ANALOG_REG 0x04
+
 void ES7210Component::setup() {
   ESP_LOGCONFIG(TAG, "Setting up ES7210 Codec for ESP32 S3 Box 3");
   
-  // Verify device presence
+  // Vérifier la présence du périphérique
   if (!this->read_register(ES7210_RESET_REG)) {
     ESP_LOGE(TAG, "ES7210 not found at address 0x%02X", this->address_);
     mark_failed();
     return;
   }
 
-  // Initialize codec and configure I2S
+  // Initialiser le codec et configurer I2S
   initialize_codec();
   configure_analog_path();
   configure_i2s();
 }
 
 void ES7210Component::initialize_codec() {
-  // Soft reset sequence
+  // Séquence de réinitialisation
   write_register(ES7210_RESET_REG, 0x80);
-  delay(10);
+  vTaskDelay(10 / portTICK_PERIOD_MS);  // Remplacer delay() par vTaskDelay
   write_register(ES7210_RESET_REG, 0x00);
 
-  // Power management and clock configuration
-  write_register(ES7210_MAINCLK_REG, 0x00);  // Master clock configuration
-  write_register(ES7210_POWER_REG, 0x00);    // Power up all channels
-  write_register(ES7210_PDN_REG, 0x00);      // Disable power down
+  // Gestion de l'alimentation et configuration de l'horloge
+  write_register(ES7210_MAINCLK_REG, 0x00);  // Configuration de l'horloge maître
+  write_register(ES7210_POWER_REG, 0x00);    // Alimentation de tous les canaux
+  write_register(ES7210_PDN_REG, 0x00);      // Désactivation de la mise en veille
 }
 
 void ES7210Component::configure_analog_path() {
-  // Specific analog path configuration for S3 Box 3
-  write_register(ES7210_ANALOG_REG, 0x33);  // Example: Configure analog input path
+  // Configuration du chemin analogique pour le S3 Box 3
+  write_register(ES7210_ANALOG_REG, 0x33);  // Exemple : configurer le chemin d'entrée analogique
 }
 
 bool ES7210Component::configure_i2s() {
@@ -56,10 +64,10 @@ bool ES7210Component::configure_i2s() {
   };
 
   i2s_pin_config_t pin_config = {
-    .bck_io_num = GPIO17,     // BCLK pin
-    .ws_io_num = GPIO45,      // LRCLK pin
+    .bck_io_num = GPIO_NUM_17,     // Pin BCLK
+    .ws_io_num = GPIO_NUM_45,      // Pin LRCLK
     .data_out_num = I2S_PIN_NO_CHANGE,
-    .data_in_num = GPIO16     // DOUT pin for microphone
+    .data_in_num = GPIO_NUM_16     // Pin DOUT pour microphone
   };
 
   esp_err_t result = i2s_driver_install(i2s_port_, &i2s_config, 0, NULL);
@@ -95,3 +103,4 @@ uint8_t ES7210Component::read_register(uint8_t reg) {
 
 }  // namespace es7210
 }  // namespace esphome
+
