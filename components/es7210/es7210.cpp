@@ -1,13 +1,14 @@
 #include "esphome/core/component.h"
 #include "esphome/components/i2c/i2c.h"
 #include "driver/i2s.h"
+#include "es7210.h"  // Assure-toi que ce fichier est bien inclus ici
 
 namespace esphome {
 namespace es7210 {
 
 static const char *const TAG = "es7210";
 
-void ES7210Component::setup() override {
+void ES7210Component::setup() {
     ESP_LOGCONFIG(TAG, "Setting up ES7210 Codec for ESP32 S3 Box 3");
 
     // Verify device presence
@@ -18,9 +19,9 @@ void ES7210Component::setup() override {
     }
 
     // Initialize codec and configure I2S
-    initialize_codec();
-    configure_analog_path();
-    configure_i2s();
+    this->initialize_codec();
+    this->configure_analog_path();
+    this->configure_i2s();
 
     // Set sample rate and bits per sample from configuration
     if (this->has_id()) {
@@ -105,5 +106,6 @@ uint8_t ES7210Component::read_register(uint8_t reg) {
 
 }  // namespace es7210
 }  // namespace esphome
+
 
 
