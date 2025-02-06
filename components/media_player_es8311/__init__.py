@@ -5,6 +5,7 @@ from esphome.components import media_player
 from esphome.components.i2s_audio import I2SAudioOut
 from ..es8311 import ES8311
 
+CODEOWNERS = ["@youkorr"]
 DEPENDENCIES = ["media_player", "i2s_audio", "es8311"]
 
 media_player_es8311_ns = cg.esphome_ns.namespace("media_player_es8311")
