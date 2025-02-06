@@ -1,7 +1,7 @@
 #pragma once
 #include "esphome/components/media_player/media_player.h"
 #include "esphome/core/component.h"
-#include "esphome/components/audio_dac/audio_dac.h"
+#include "esphome/components/i2s_audio/i2s_audio.h"
 
 namespace esphome {
 namespace media_player_es8311 {
@@ -12,7 +12,7 @@ class MediaPlayerES8311 : public media_player::MediaPlayer, public Component {
   void loop() override;
   void dump_config() override;
 
-  void set_audio_dac(audio_dac::AudioDAC *audio_dac) { this->audio_dac_ = audio_dac; }
+  void set_i2s_audio(i2s_audio::I2SAudioOut *i2s_audio) { this->i2s_audio_ = i2s_audio; }
   void set_sample_rate(uint32_t sample_rate) { this->sample_rate_ = sample_rate; }
 
   void play() override;
@@ -23,10 +23,9 @@ class MediaPlayerES8311 : public media_player::MediaPlayer, public Component {
   void set_media_source(const std::string &source);
 
  protected:
-  audio_dac::AudioDAC *audio_dac_;
+  i2s_audio::I2SAudioOut *i2s_audio_;
   uint32_t sample_rate_;
 };
 
 }  // namespace media_player_es8311
 }  // namespace esphome
-
