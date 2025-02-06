@@ -1,37 +1,56 @@
-#pragma once
-#include "esphome/components/media_player/media_player.h"
-#include "esphome/core/component.h"
-#include "esphome/components/i2s_audio/i2s_audio.h"
-#include "esphome/components/es8311/es8311.h"
+#include "media_player_es8311.h"
+#include "esphome/core/log.h"
 
 namespace esphome {
 namespace media_player_es8311 {
 
-class MediaPlayerES8311 : public media_player::MediaPlayer, public Component {
- public:
-  void setup() override;
-  void loop() override;
-  void dump_config() override;
+static const char *const TAG = "media_player_es8311";
 
-  void set_i2s_audio(i2s_audio::I2SAudioOut *i2s_audio) { this->i2s_audio_ = i2s_audio; }
-  void set_es8311(es8311::ES8311 *es8311) { this->es8311_ = es8311; }
-  void set_sample_rate(uint32_t sample_rate) { this->sample_rate_ = sample_rate; }
+void MediaPlayerES8311::setup() {
+  ESP_LOGCONFIG(TAG, "Setting up MediaPlayerES8311...");
+}
 
-  void play() override;
-  void stop() override;
-  void pause() override;
-  void set_volume(float volume) override;
-  void mute(bool mute) override;
-  void set_media_source(const std::string &source);
+void MediaPlayerES8311::dump_config() {
+  ESP_LOGCONFIG(TAG, "MediaPlayerES8311:");
+}
 
- protected:
-  i2s_audio::I2SAudioOut *i2s_audio_;
-  es8311::ES8311 *es8311_;
-  uint32_t sample_rate_;
-};
+void MediaPlayerES8311::loop() {
+  // Gérer le traitement audio ici
+}
+
+void MediaPlayerES8311::play() {
+  ESP_LOGI(TAG, "Playing media...");
+  this->state = media_player::MEDIA_PLAYER_STATE_PLAYING;
+}
+
+void MediaPlayerES8311::stop() {
+  ESP_LOGI(TAG, "Stopping playback...");
+  this->state = media_player::MEDIA_PLAYER_STATE_IDLE;
+}
+
+void MediaPlayerES8311::pause() {
+  ESP_LOGI(TAG, "Pausing playback...");
+  this->state = media_player::MEDIA_PLAYER_STATE_PAUSED;
+}
+
+void MediaPlayerES8311::set_volume(float volume) {
+  ESP_LOGI(TAG, "Setting volume: %.2f", volume);
+  this->volume_ = volume;
+}
+
+void MediaPlayerES8311::mute(bool mute) {
+  ESP_LOGI(TAG, "Mute: %s", mute ? "ON" : "OFF");
+  this->is_muted_ = mute;
+}
+
+void MediaPlayerES8311::set_media_source(const std::string &source) {
+  ESP_LOGI(TAG, "Setting media source: %s", source.c_str());
+  this->current_source_ = source;
+}
 
 }  // namespace media_player_es8311
 }  // namespace esphome
+
 
 
 
