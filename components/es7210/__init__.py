@@ -19,7 +19,7 @@ CONFIG_SCHEMA = cv.Schema({
 }).extend(i2c.i2c_device_schema(0x40))
 
 async def to_code(config):
-    var = cg.new_Pvariable(config[cv.GenerateID()])  # Correction ici
+    var = cg.new_Pvariable(config[cv.GenerateID()])
     await cg.register_component(var, config)
     await i2c.register_i2c_device(var, config)
 
@@ -27,5 +27,6 @@ async def to_code(config):
         cg.add(var.set_sample_rate(config[CONF_SAMPLE_RATE]))
     if CONF_BITS_PER_SAMPLE in config:
         cg.add(var.set_bits_per_sample(config[CONF_BITS_PER_SAMPLE]))
+
 
 
