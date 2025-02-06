@@ -1,4 +1,8 @@
 #include "esphome/components/es7210/es7210.h"
+#include "esphome/components/es7210/microphone.h"
+#include "esphome/core/log.h"
+#include "driver/i2s.h"
+#include "gpio_definitions.h"  // Include the GPIO definitions here
 
 namespace esphome {
 namespace es7210 {
