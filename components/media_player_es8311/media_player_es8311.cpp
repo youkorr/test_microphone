@@ -8,14 +8,16 @@ static const char *const TAG = "media_player_es8311";
 
 void MediaPlayerES8311::setup() {
   ESP_LOGCONFIG(TAG, "Setting up MediaPlayerES8311...");
+  ESP_LOGCONFIG(TAG, "  Sample Rate: %d", this->sample_rate_);
 }
 
 void MediaPlayerES8311::dump_config() {
   ESP_LOGCONFIG(TAG, "MediaPlayerES8311:");
+  ESP_LOGCONFIG(TAG, "  Sample Rate: %d", this->sample_rate_);
 }
 
 void MediaPlayerES8311::loop() {
-  // Gérer le traitement audio ici
+  // Audio processing here
 }
 
 void MediaPlayerES8311::play() {
