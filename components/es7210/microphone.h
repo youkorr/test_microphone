@@ -12,7 +12,7 @@ class ES7210Microphone : public microphone::Microphone {
   void set_es7210(ES7210Component *es7210) { this->es7210_ = es7210; }
 
  protected:
-  bool is_ready_() const { return true; }
+  bool is_ready_() const override { return true; }
   int read_chunk_(int16_t *buffer, size_t length) override;
 
  private:
@@ -22,5 +22,6 @@ class ES7210Microphone : public microphone::Microphone {
 
 }  // namespace es7210
 }  // namespace esphome
+
 
 
