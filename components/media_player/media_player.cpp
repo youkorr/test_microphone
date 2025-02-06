@@ -1,4 +1,5 @@
 #include "media_player.h"
+
 #include "esphome/core/log.h"
 
 namespace esphome {
@@ -6,7 +7,6 @@ namespace media_player {
 
 static const char *const TAG = "media_player";
 
-// Conversion des états en chaînes de caractères
 const char *media_player_state_to_string(MediaPlayerState state) {
   switch (state) {
     case MEDIA_PLAYER_STATE_IDLE:
@@ -23,7 +23,6 @@ const char *media_player_state_to_string(MediaPlayerState state) {
   }
 }
 
-// Conversion des commandes en chaînes de caractères
 const char *media_player_command_to_string(MediaPlayerCommand command) {
   switch (command) {
     case MEDIA_PLAYER_COMMAND_PLAY:
@@ -47,7 +46,21 @@ const char *media_player_command_to_string(MediaPlayerCommand command) {
   }
 }
 
-// Validation des commandes
+const char *media_player_file_type_to_string(MediaFileType file_type) {
+  switch (file_type) {
+    // case MediaFileType::NONE:
+    //   return "unknown";
+    case MediaFileType::FLAC:
+      return "FLAC";
+    case MediaFileType::MP3:
+      return "MP3";
+    case MediaFileType::WAV:
+      return "WAV";
+    default:
+      return "unknonw";
+  }
+}
+
 void MediaPlayerCall::validate_() {
   if (this->media_url_.has_value()) {
     if (this->command_.has_value()) {
@@ -63,7 +76,6 @@ void MediaPlayerCall::validate_() {
   }
 }
 
-// Exécution des commandes
 void MediaPlayerCall::perform() {
   ESP_LOGD(TAG, "'%s' - Setting", this->parent_->get_name().c_str());
   this->validate_();
@@ -83,17 +95,14 @@ void MediaPlayerCall::perform() {
   this->parent_->control(*this);
 }
 
-// Méthodes pour définir les commandes
 MediaPlayerCall &MediaPlayerCall::set_command(MediaPlayerCommand command) {
   this->command_ = command;
   return *this;
 }
-
 MediaPlayerCall &MediaPlayerCall::set_command(optional<MediaPlayerCommand> command) {
   this->command_ = command;
   return *this;
 }
-
 MediaPlayerCall &MediaPlayerCall::set_command(const std::string &command) {
   if (str_equals_case_insensitive(command, "PLAY")) {
     this->set_command(MEDIA_PLAYER_COMMAND_PLAY);
@@ -118,6 +127,11 @@ MediaPlayerCall &MediaPlayerCall::set_media_url(const std::string &media_url) {
   return *this;
 }
 
+MediaPlayerCall &MediaPlayerCall::set_local_media_file(MediaFile *media_file) {
+  this->media_file_ = media_file;
+  return *this;
+}
+
 MediaPlayerCall &MediaPlayerCall::set_volume(float volume) {
   this->volume_ = volume;
   return *this;
@@ -128,7 +142,6 @@ MediaPlayerCall &MediaPlayerCall::set_announcement(bool announce) {
   return *this;
 }
 
-// Méthodes de la classe MediaPlayer
 void MediaPlayer::add_on_state_callback(std::function<void()> &&callback) {
   this->state_callback_.add(std::move(callback));
 }
