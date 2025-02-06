@@ -1,0 +1,8 @@
+#ifndef GPIO_DEFINITIONS_H
+#define GPIO_DEFINITIONS_H
+
+#define GPIO_NUM_17 17
+#define GPIO_NUM_45 45
+#define GPIO_NUM_16 16
+
+#endif // GPIO_DEFINITIONS_H
