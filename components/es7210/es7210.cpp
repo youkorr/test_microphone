@@ -1,9 +1,3 @@
-#include "es7210.h"
-#include "esphome/core/log.h"
-#include "driver/i2s.h"
-#include "esphome/core/gpio.h"
-#include "esphome/components/es7210/microphone.h"  // Assurez-vous d'inclure microphone.h
-
 namespace esphome {
 namespace es7210 {
 
@@ -13,6 +7,9 @@ static const char *const TAG = "es7210";
 #define GPIO_NUM_17 17
 #define GPIO_NUM_45 45
 #define GPIO_NUM_16 16
+
+// Déclare le port I2S ici si nécessaire
+i2s_port_t i2s_port_ = I2S_NUM_0;  // Définir le port I2S (ou I2S_NUM_1 selon ton matériel)
 
 void ES7210Component::setup() {
   ESP_LOGCONFIG(TAG, "Setting up ES7210 Codec for ESP32 S3 Box 3");
@@ -84,22 +81,6 @@ bool ES7210Component::configure_i2s() {
   return true;
 }
 
-void ES7210Component::dump_config() {
-  ESP_LOGCONFIG(TAG, "ES7210 Codec Configuration:");
-  ESP_LOGCONFIG(TAG, "  I2C Address: 0x%02X", this->address_);
-  ESP_LOGCONFIG(TAG, "  Sample Rate: %u Hz", sample_rate_);
-  ESP_LOGCONFIG(TAG, "  Bits per Sample: %u", bits_per_sample_);
-}
-
-bool ES7210Component::write_register(uint8_t reg, uint8_t value) {
-  return this->write_byte(reg, value);
-}
-
-uint8_t ES7210Component::read_register(uint8_t reg) {
-  uint8_t value;
-  return this->read_byte(reg, &value) ? value : 0xFF;
-}
-
 // Implémentation de la méthode read_chunk_
 int ES7210Microphone::read_chunk_(int16_t *buffer, size_t length) {
   // Ici tu peux ajouter la logique de lecture des données I2S du codec ES7210
@@ -113,6 +94,7 @@ int ES7210Microphone::read_chunk_(int16_t *buffer, size_t length) {
 
 }  // namespace es7210
 }  // namespace esphome
+
 
 
 
