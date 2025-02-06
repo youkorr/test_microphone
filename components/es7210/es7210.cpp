@@ -1,7 +1,8 @@
 #include "es7210.h"
 #include "esphome/core/log.h"
 #include "driver/i2s.h"
-#include "esphome/core/gpio.h"  // Assure l'inclusion des définitions GPIO
+#include "esphome/core/gpio.h"
+#include "esphome/components/es7210/microphone.h"  // Assurez-vous d'inclure microphone.h
 
 namespace esphome {
 namespace es7210 {
@@ -15,7 +16,7 @@ static const char *const TAG = "es7210";
 
 void ES7210Component::setup() {
   ESP_LOGCONFIG(TAG, "Setting up ES7210 Codec for ESP32 S3 Box 3");
-  
+
   // Vérifier la présence du périphérique
   if (!this->read_register(ES7210_RESET_REG)) {
     ESP_LOGE(TAG, "ES7210 not found at address 0x%02X", this->address_);
@@ -101,12 +102,17 @@ uint8_t ES7210Component::read_register(uint8_t reg) {
 
 // Implémentation de la méthode read_chunk_
 int ES7210Microphone::read_chunk_(int16_t *buffer, size_t length) {
-  // Remplir ce buffer avec des données du codec
-  // Ici tu dois ajouter ta logique pour lire les données I2S du codec ES7210
-  return 0;  // Valeur de retour à ajuster selon ton besoin
+  // Ici tu peux ajouter la logique de lecture des données I2S du codec ES7210
+  esp_err_t err = i2s_read(i2s_port_, buffer, length * sizeof(int16_t), &length, portMAX_DELAY);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "Failed to read chunk: %s", esp_err_to_name(err));
+    return -1;
+  }
+  return length;  // Retourne le nombre d'échantillons lus
 }
 
 }  // namespace es7210
 }  // namespace esphome
+
 
 
