@@ -13,8 +13,8 @@ const char *media_player_state_to_string(MediaPlayerState state) {
       return "IDLE";
     case MEDIA_PLAYER_STATE_PLAYING:
       return "PLAYING";
-    case MEDIA_PLAYER_STATE_STOP:
-      return "STOP";
+    case MEDIA_PLAYER_STATE_PAUSED:
+      return "PAUSED";
     case MEDIA_PLAYER_STATE_ANNOUNCING:
       return "ANNOUNCING";
     case MEDIA_PLAYER_STATE_NONE:
