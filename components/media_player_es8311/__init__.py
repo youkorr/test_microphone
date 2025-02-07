@@ -13,7 +13,7 @@ MediaPlayerES8311 = media_player_es8311_ns.class_(
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(MediaPlayerES8311),
-    cv.Required(CONF_I2C_ID): cv.use_id(i2c.I2CComponent), #CHANGED
+    cv.Required(CONF_I2C_ID): cv.use_id(i2c),  # CHANGED
     cv.Optional(CONF_SAMPLE_RATE, default=16000): cv.int_range(min=1),
 }).extend(media_player.MEDIA_PLAYER_SCHEMA).extend(cv.COMPONENT_SCHEMA)
 
