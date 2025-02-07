@@ -51,7 +51,7 @@ def validate_sample_rate(value):
 CONFIG_SCHEMA = media_player.MEDIA_PLAYER_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(MediaPlayerES8311),
-        cv.Required(CONF_AUDIO_DAC): cv.use_id(audio_dac.AudioDAC),  # Change for audio_dac
+        cv.Required(CONF_AUDIO_DAC): cv.use_id(audio_dac),  # Use audio_dac directly
         cv.Required(CONF_OUTPUT): cv.use_id(output.BinaryOutput),
         cv.Optional(CONF_SAMPLE_RATE, default=16000): cv.All(
             cv.Coerce(int), validate_sample_rate
@@ -70,7 +70,7 @@ async def to_code(config):
     cg.add(var.set_audio_dac(dac))  # Call setter method to pass in AudioDac object
 
     # Get the speaker component and set it on the media player
-    speaker = await cg.get_variable(config[CONF_OUTPUT])  # Ensure the correct configuration.
+    speaker = await cg.get_variable(config[CONF_OUTPUT])  # Set the correct configuration.
     cg.add(var.set_speaker(speaker))  # Call setter method to pass in speaker object.
 
     sample_rate = config[CONF_SAMPLE_RATE]
