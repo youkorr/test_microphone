@@ -7,10 +7,12 @@ from esphome.components import (
 )
 from esphome.const import (
     CONF_ID,
-    CONF_AUDIO_DAC,  # Change the library
     CONF_OUTPUT,
     CONF_SAMPLE_RATE,
 )
+
+# DEFINE CONF_AUDIO_DAC MANUALLY (if you cannot update ESPHome)
+CONF_AUDIO_DAC = "audio_dac"
 
 # Custom component namespace
 DEPENDENCIES = ["audio_dac", "output"]  # Change the dependency
