@@ -4,7 +4,6 @@ from esphome.components import audio, esp32, speaker
 import esphome.config_validation as cv
 from esphome.const import (
     CONF_BITS_PER_SAMPLE,
-    CONF_BUFFER_DURATION,
     CONF_CHANNEL,
     CONF_ID,
     CONF_MODE,
@@ -13,6 +12,9 @@ from esphome.const import (
     CONF_SAMPLE_RATE,
     CONF_TIMEOUT,
 )
+
+# Ajout manuel de la constante CONF_BUFFER_DURATION si elle est manquante
+CONF_BUFFER_DURATION = "buffer_duration"
 
 from .. import (
     CONF_I2S_DOUT_PIN,
