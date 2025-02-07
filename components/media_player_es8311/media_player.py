@@ -14,16 +14,6 @@ media_player_es8311_ns = cg.esphome_ns.namespace("media_player_es8311")
 MediaPlayerES8311 = media_player_es8311_ns.class_(
     "MediaPlayerES8311", media_player.MediaPlayer, cg.Component
 )
-# Implemented the default properties within h file.
-MediaPlayerES8311.set_audio_dac = cg.MockComponentMethod(
-    [audio_dac.AudioDAC], template_arg=None
-)
-MediaPlayerES8311.set_speaker = cg.MockComponentMethod(
-    [output.BinaryOutput], template_arg=None
-)
-MediaPlayerES8311.set_sample_rate = cg.MockComponentMethod(
-    [cg.uint32], template_arg=None
-)
 
 @cg.coroutine
 def new_es8311_media_player(config):
