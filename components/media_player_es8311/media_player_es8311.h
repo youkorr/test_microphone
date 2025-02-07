@@ -31,6 +31,7 @@ class MediaPlayerES8311 : public media_player::MediaPlayer, public Component {
   output::BinaryOutput *speaker_{nullptr}; //This has to be included
   uint32_t sample_rate_{16000}; //This has to be included
 
+  
 };
 
 }  // namespace media_player_es8311
