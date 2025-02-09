@@ -12,7 +12,7 @@ from esphome.const import (
     CONF_TIMEOUT,
 )
 
-# Gestion de la constante CONF_NEER manquante
+# Gestion de la constante CONF_NEVER manquante
 try:
     from esphome.const import CONF_NEVER
 except ImportError:
@@ -82,24 +82,38 @@ def _set_num_channels_from_config(config):
 def _set_stream_limits(config):
     if config[CONF_I2S_MODE] == CONF_PRIMARY:
         # Primary mode has modifiable stream settings
-        audio.set_stream_limits(
-            min_bits_per_sample=8,
-            max_bits_per_sample=32,
-            min_channels=1,
-            max_channels=2,
-            min_sample_rate=16000,
-            max_sample_rate=48000,
-        )(config)
+        if hasattr(audio, 'set_stream_limits'):
+            # Use set_stream_limits if available (older ESPHome versions)
+            audio.set_stream_limits(
+                min_bits_per_sample=8,
+                max_bits_per_sample=32,
+                min_channels=1,
+                max_channels=2,
+                min_sample_rate=16000,
+                max_sample_rate=48000,
+            )(config)
+        else:
+            # Manually set stream limits if set_stream_limits is not available
+            config[CONF_BITS_PER_SAMPLE] = cv.one_of(8, 16, 24, 32)(config.get(CONF_BITS_PER_SAMPLE, 16))
+            config[CONF_NUM_CHANNELS] = cv.one_of(1, 2)(config.get(CONF_NUM_CHANNELS, 1))
+            config[CONF_SAMPLE_RATE] = cv.one_of(16000, 44100, 48000)(config.get(CONF_SAMPLE_RATE, 16000))
     else:
         # Secondary mode has unmodifiable max bits per sample and min/max sample rates
-        audio.set_stream_limits(
-            min_bits_per_sample=8,
-            max_bits_per_sample=config.get(CONF_BITS_PER_SAMPLE),
-            min_channels=1,
-            max_channels=2,
-            min_sample_rate=config.get(CONF_SAMPLE_RATE),
-            max_sample_rate=config.get(CONF_SAMPLE_RATE),
-        )
+        if hasattr(audio, 'set_stream_limits'):
+            # Use set_stream_limits if available (older ESPHome versions)
+            audio.set_stream_limits(
+                min_bits_per_sample=8,
+                max_bits_per_sample=config.get(CONF_BITS_PER_SAMPLE),
+                min_channels=1,
+                max_channels=2,
+                min_sample_rate=config.get(CONF_SAMPLE_RATE),
+                max_sample_rate=config.get(CONF_SAMPLE_RATE),
+            )
+        else:
+            # Manually set stream limits if set_stream_limits is not available
+            config[CONF_BITS_PER_SAMPLE] = cv.one_of(8, 16, 24, 32)(config.get(CONF_BITS_PER_SAMPLE, 16))
+            config[CONF_NUM_CHANNELS] = cv.one_of(1, 2)(config.get(CONF_NUM_CHANNELS, 1))
+            config[CONF_SAMPLE_RATE] = cv.one_of(16000, 44100, 48000)(config.get(CONF_SAMPLE_RATE, 16000))
 
     return config
 
