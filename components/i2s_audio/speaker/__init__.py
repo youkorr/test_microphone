@@ -7,12 +7,17 @@ from esphome.const import (
     CONF_CHANNEL,
     CONF_ID,
     CONF_MODE,
-    CONF_NEVER,
     CONF_NUM_CHANNELS,
     CONF_SAMPLE_RATE,
     CONF_TIMEOUT,
 )
-CONF_NEVER = "never"
+
+# Gestion de la constante CONF_NEER manquante
+try:
+    from esphome.const import CONF_NEVER
+except ImportError:
+    CONF_NEVER = "never"
+
 # Ajout manuel de la constante CONF_BUFFER_DURATION si elle est manquante
 CONF_BUFFER_DURATION = "buffer_duration"
 
